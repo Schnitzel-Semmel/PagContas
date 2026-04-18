@@ -1,0 +1,28 @@
+:root {
+    --bg-color: #f4f7fb;
+    --card-color: #ffffff;
+    --primary-color: #239a55;
+    --primary-hover: #1d7f46;
+    --text-color: #1f2937;
+    --muted-color: #6b7280;
+    --border-color: #dbe3ee;
+    --error-bg: #fef2f2;
+    --error-text: #b91c1c;
+    --shadow-soft: 0 12px 35px rgba(15, 23, 42, 0.08);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: var(--bg-color);
+    color: var(--text-color);
+}
+
+button,
+input {
+    font: inherit;
+}
