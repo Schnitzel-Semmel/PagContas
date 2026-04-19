@@ -2,6 +2,8 @@ const telefoneInput = document.getElementById("telefone");
 const senhaInput = document.getElementById("senha");
 const toggleSenha = document.getElementById("toggleSenha");
 const loginForm = document.getElementById("loginForm");
+const msgTelefone = document.getElementById("error-telefone");
+const msgSenha = document.getElementById("error-senha");
 
 function aplicarMascaraTelefone(valor) {
   const numeros = valor.replace(/\D/g, "").slice(0, 11);
@@ -31,16 +33,23 @@ if (loginForm) {
   loginForm.addEventListener("submit", (event) => {
     const telefone = telefoneInput.value.replace(/\D/g, "");
     const senha = senhaInput.value.trim();
-
     if (!telefone || !senha) {
       event.preventDefault();
-      window.alert("Preencha o telefone e a senha antes de continuar.");
+      if (!telefone) {
+          telefoneInput.classList.add("input-error");
+          msgTelefone.style.display = "block";
+      }
+
+      if (!senha) {
+          senhaInput.classList.add("input-error");
+          msgSenha.style.display = "block";
+      }
       return;
-    }
+      }
 
     if (telefone.length < 10 || telefone.length > 11) {
       event.preventDefault();
-      window.alert("Digite um telefone valido com DDD.");
+      telefoneInput.classList.add("input-error");
     }
   });
 }

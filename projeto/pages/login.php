@@ -17,6 +17,7 @@ $telefone = $_GET['telefone'] ?? '';
     <title>PagContas | Login</title>
     <link rel="stylesheet" href="../css/global.css">
     <link rel="stylesheet" href="../css/login.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
     <main class="login-page">
@@ -33,16 +34,11 @@ $telefone = $_GET['telefone'] ?? '';
             <p class="login-description">
                 Use seu telefone e sua senha para acessar o sistema.
             </p>
-
-            <?php if ($erro === 'campos'): ?>
-                <div class="login-alert login-alert--error">
-                    Preencha o telefone e a senha.
+            <?php if ($erro == 'usuarioErro'): ?> 
+                <div class="msg-erro">
+                    <p>Telefone ou senha incorretos.<p>
                 </div>
-            <?php elseif ($erro === 'usuario'): ?>
-                <div class="login-alert login-alert--error">
-                    Telefone ou senha incorretos.
-                </div>
-            <?php elseif ($erro === 'sistema'): ?>
+            <?php elseif ($erro == 'sistema'): ?>
                 <div class="login-alert login-alert--error">
                     Nao foi possivel entrar agora. Tente novamente.
                 </div>
@@ -55,11 +51,11 @@ $telefone = $_GET['telefone'] ?? '';
                         type="text"
                         id="telefone"
                         name="telefone"
-                        placeholder="(65) 99999-9999"
+                        placeholder="(99) 99999-9999"
                         maxlength="15"
                         value="<?= htmlspecialchars($telefone, ENT_QUOTES, 'UTF-8'); ?>"
-                        required
                     >
+                    <p id="error-telefone" class="msg-erro" >Por favor, preencha o telefone.</p>
                 </div>
 
                 <div class="form-group">
@@ -70,19 +66,18 @@ $telefone = $_GET['telefone'] ?? '';
                             id="senha"
                             name="senha"
                             placeholder="Digite sua senha"
-                            required
                         >
                         <button type="button" class="password-toggle" id="toggleSenha">
                             Mostrar
                         </button>
                     </div>
+                    <p id="error-senha" class="msg-erro" >A senha é obrigatória.</p>
                 </div>
 
-                <button type="submit" class="login-button">Entrar</button>
+                <button type="submit" class="login-button" >Entrar</button>
             </form>
         </section>
     </main>
-
     <script src="../js/login.js"></script>
 </body>
 </html>

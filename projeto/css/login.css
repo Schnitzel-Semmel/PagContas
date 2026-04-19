@@ -8,7 +8,7 @@
 
 .login-card {
     width: 100%;
-    max-width: 440px;
+    max-width: 500px;
     background: var(--card-color);
     border: 1px solid var(--border-color);
     border-radius: 20px;
@@ -71,11 +71,15 @@
 
 .login-form {
     display: grid;
-    gap: 18px;
+    margin-bottom: 25px;
+    position: relative;
+    gap: 13px;
 }
 
 .form-group {
     display: grid;
+    margin-bottom: 20px;
+    position: relative;
     gap: 8px;
 }
 
@@ -129,4 +133,18 @@
 
 .login-button:hover {
     background: var(--primary-hover);
+}
+
+.input-error {
+    border-color: var(--error-text) !important;
+}
+
+.msg-erro {
+    position: absolute;
+    top: 63px;
+    left: 0;
+    color: var(--error-text);
+    display: none;
+    font-size: xx-small;
+    font: var(--font-text);
 }
