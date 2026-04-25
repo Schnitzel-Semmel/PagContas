@@ -27,6 +27,22 @@ $nomeUsuario = $_SESSION['nome_usuario'] ?? 'Usuario';
                 <strong style="font-size:1.2rem;color:#239a55;">PagContas</strong>
             </div>
 
+            <div>
+                <a href="../pages/categorias.php" style="color:#239a55;text-decoration:none;font-weight:600;">Categorias</a>
+            </div>
+
+            <div>
+                <a href="../pages/configuracoes.php" style="color:#239a55;text-decoration:none;font-weight:600;">Configuracoes</a>
+            </div>
+
+            <div>
+                <a href="../pages/contas.php" style="color:#239a55;text-decoration:none;font-weight:600;">Contas</a>
+            </div>
+
+            <div>
+                <a href="../pages/gastos.php" style="color:#239a55;text-decoration:none;font-weight:600;">Gastos</a>
+            </div>
+
             <div style="display:flex;align-items:center;gap:16px;">
                 <span style="color:#374151;">Ola, <?= htmlspecialchars($nomeUsuario, ENT_QUOTES, 'UTF-8'); ?></span>
                 <a href="../actions/logout_action.php" style="color:#b91c1c;text-decoration:none;font-weight:600;">Sair</a>
