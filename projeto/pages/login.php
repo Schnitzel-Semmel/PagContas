@@ -1,5 +1,7 @@
 <?php
 session_start();
+header('Content-Type: text/html; charset=UTF-8');
+ini_set('default_charset', 'UTF-8');
 
 if (isset($_SESSION['id_usuario'])) {
     header('Location: dashboard.php');
@@ -36,7 +38,7 @@ $telefone = $_GET['telefone'] ?? '';
             </p>
             <?php if ($erro == 'sistema'): ?>
                 <div class="login-alert login-alert--error">
-                    Nao foi possivel entrar agora. Tente novamente.
+                    Não foi possível entrar agora. Tente novamente.
                 </div>
             <?php endif; ?>
 
@@ -51,7 +53,7 @@ $telefone = $_GET['telefone'] ?? '';
                         maxlength="15"
                         value="<?= htmlspecialchars($telefone, ENT_QUOTES, 'UTF-8'); ?>"
                     >
-                    <p id="error-telefone" class="msg-erro" >Por favor, preencha o telefone.</p>
+                    <p id="error-telefone" class="msg-erro">Por favor, preencha o telefone.</p>
                 </div>
 
                 <div class="form-group">
@@ -67,13 +69,13 @@ $telefone = $_GET['telefone'] ?? '';
                             Mostrar
                         </button>
                     </div>
-                    <p id="error-senha" class="msg-erro" >A senha é obrigatória.</p>
+                    <p id="error-senha" class="msg-erro">A senha é obrigatória.</p>
                 <?php if ($erro == 'usuario'): ?> 
-                    <p id="error-login" class="msg-erro" >Email ou senha incorretos.</p>
+                    <p id="error-login" class="msg-erro">E-mail ou senha incorretos.</p>
                 <?php endif; ?>
                 </div>
                 
-                <button type="submit" class="login-button" >Entrar</button>
+                <button type="submit" class="login-button">Entrar</button>
             </form>
         </section>
     </main>
