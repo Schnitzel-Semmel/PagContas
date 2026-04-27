@@ -1,5 +1,7 @@
 <?php
 
+ini_set('default_charset', 'UTF-8');
+
 $host = "localhost";
 $dbname = "pagcontasdb";
 $user = "root";
@@ -15,6 +17,7 @@ try {
 
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     $conn->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+    $conn->exec("SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci");
 } catch (PDOException $e) {
-    die("Erro na conexao com o banco de dados: " . $e->getMessage());
+    die("Erro na conexão com o banco de dados: " . $e->getMessage());
 }

@@ -1,3 +1,6 @@
-<div class="footer">
-  <p>PagContas - Engenharia de Software, UNIVAG - 2026</p>
-</div>
+<footer class="footer">
+    <div class="footer__content">
+        <p>PagContas</p>
+        <p>© 2026 PagContas. Engenharia de Software - UNIVAG.</p>
+    </div>
+</footer>

@@ -3,9 +3,12 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+header('Content-Type: text/html; charset=UTF-8');
+ini_set('default_charset', 'UTF-8');
+
 $tituloPagina = $tituloPagina ?? 'PagContas';
 $cssPagina = $cssPagina ?? null;
-$nomeUsuario = $_SESSION['nome_usuario'] ?? 'Usuario';
+$nomeUsuario = $_SESSION['nome_usuario'] ?? 'Usuário';
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -32,7 +35,7 @@ $nomeUsuario = $_SESSION['nome_usuario'] ?? 'Usuario';
             </div>
 
             <div>
-                <a href="../pages/configuracoes.php" style="color:#239a55;text-decoration:none;font-weight:600;">Configuracoes</a>
+                <a href="../pages/configuracoes.php" style="color:#239a55;text-decoration:none;font-weight:600;">Configurações</a>
             </div>
 
             <div>
@@ -44,7 +47,7 @@ $nomeUsuario = $_SESSION['nome_usuario'] ?? 'Usuario';
             </div>
 
             <div style="display:flex;align-items:center;gap:16px;">
-                <span style="color:#374151;">Ola, <?= htmlspecialchars($nomeUsuario, ENT_QUOTES, 'UTF-8'); ?></span>
+                <span style="color:#374151;">Olá, <?= htmlspecialchars($nomeUsuario, ENT_QUOTES, 'UTF-8'); ?></span>
                 <a href="../actions/logout_action.php" style="color:#b91c1c;text-decoration:none;font-weight:600;">Sair</a>
             </div>
         </div>
