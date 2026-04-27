@@ -22,7 +22,7 @@ try {
     $usuario = $stmt->fetch();
 
     if (!$usuario || !password_verify($senha, $usuario['senha_hash'])) {
-        header('Location: ../pages/login.php?erro=usuarioErro=' . urlencode($telefone));
+        header('Location: ../pages/login.php?erro=usuario&telefone=' . urlencode($telefone));
         exit;
     }
 

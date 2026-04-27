@@ -4,6 +4,44 @@ const toggleSenha = document.getElementById("toggleSenha");
 const loginForm = document.getElementById("loginForm");
 const msgTelefone = document.getElementById("error-telefone");
 const msgSenha = document.getElementById("error-senha");
+const msgLogin = document.getElementById("error-login");
+const params = new URLSearchParams(window.location.search);
+const erro = params.get("erro");
+
+function mostrarMensagem(elemento) {
+  if (elemento) {
+    elemento.style.display = "block";
+  }
+}
+
+function esconderMensagem(elemento) {
+  if (elemento) {
+    elemento.style.display = "none";
+  }
+}
+
+function limparErroTelefone() {
+  if (telefoneInput) {
+    telefoneInput.classList.remove("input-error");
+  }
+
+  esconderMensagem(msgTelefone);
+  esconderMensagem(msgLogin);
+}
+
+function limparErroSenha() {
+  if (senhaInput) {
+    senhaInput.classList.remove("input-error");
+  }
+  if (telefoneInput) {
+    telefoneInput.classList.remove("input-error");
+  }
+
+  esconderMensagem(msgTelefone);
+  esconderMensagem(msgLogin);
+  esconderMensagem(msgSenha);
+  esconderMensagem(msgLogin);
+}
 
 function aplicarMascaraTelefone(valor) {
   const numeros = valor.replace(/\D/g, "").slice(0, 11);
@@ -16,9 +54,16 @@ function aplicarMascaraTelefone(valor) {
 if (telefoneInput) {
   telefoneInput.addEventListener("input", (event) => {
     event.target.value = aplicarMascaraTelefone(event.target.value);
+    limparErroTelefone();
   });
 
   telefoneInput.value = aplicarMascaraTelefone(telefoneInput.value);
+}
+
+if (senhaInput) {
+  senhaInput.addEventListener("input", () => {
+    limparErroSenha();
+  });
 }
 
 if (toggleSenha && senhaInput) {
@@ -29,27 +74,40 @@ if (toggleSenha && senhaInput) {
   });
 }
 
+if (erro === "usuario") {
+  telefoneInput?.classList.add("input-error");
+  senhaInput?.classList.add("input-error");
+  mostrarMensagem(msgLogin);
+}
+
 if (loginForm) {
   loginForm.addEventListener("submit", (event) => {
     const telefone = telefoneInput.value.replace(/\D/g, "");
     const senha = senhaInput.value.trim();
+
+    limparErroTelefone();
+    limparErroSenha();
+
     if (!telefone || !senha) {
       event.preventDefault();
+
       if (!telefone) {
-          telefoneInput.classList.add("input-error");
-          msgTelefone.style.display = "block";
+        telefoneInput.classList.add("input-error");
+        mostrarMensagem(msgTelefone);
       }
 
       if (!senha) {
-          senhaInput.classList.add("input-error");
-          msgSenha.style.display = "block";
+        senhaInput.classList.add("input-error");
+        mostrarMensagem(msgSenha);
       }
+
       return;
-      }
+    }
 
     if (telefone.length < 10 || telefone.length > 11) {
       event.preventDefault();
       telefoneInput.classList.add("input-error");
+      mostrarMensagem(msgTelefone);
     }
   });
 }
