@@ -34,11 +34,7 @@ $telefone = $_GET['telefone'] ?? '';
             <p class="login-description">
                 Use seu telefone e sua senha para acessar o sistema.
             </p>
-            <?php if ($erro == 'usuarioErro'): ?> 
-                <div class="msg-erro">
-                    <p>Telefone ou senha incorretos.<p>
-                </div>
-            <?php elseif ($erro == 'sistema'): ?>
+            <?php if ($erro == 'sistema'): ?>
                 <div class="login-alert login-alert--error">
                     Nao foi possivel entrar agora. Tente novamente.
                 </div>
@@ -72,8 +68,11 @@ $telefone = $_GET['telefone'] ?? '';
                         </button>
                     </div>
                     <p id="error-senha" class="msg-erro" >A senha é obrigatória.</p>
+                <?php if ($erro == 'usuario'): ?> 
+                    <p id="error-login" class="msg-erro" >Email ou senha incorretos.</p>
+                <?php endif; ?>
                 </div>
-
+                
                 <button type="submit" class="login-button" >Entrar</button>
             </form>
         </section>

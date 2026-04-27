@@ -145,6 +145,6 @@
     left: 0;
     color: var(--error-text);
     display: none;
-    font-size: xx-small;
+    font-size: 0.85rem;
     font: var(--font-text);
 }
