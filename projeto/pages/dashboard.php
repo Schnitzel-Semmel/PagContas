@@ -46,8 +46,8 @@ require_once '../includes/header.php';
 
         <article class="cartao-resumo">
             <span class="cartao-resumo__rotulo">Categorias ativas</span>
-            <strong class="cartao-resumo__valor">8</strong>
-            <p class="cartao-resumo__meta">3 acima de 70% da meta</p>
+            <strong class="cartao-resumo__valor">11</strong>
+            <p class="cartao-resumo__meta">Categorias padrão disponíveis para todas as contas</p>
         </article>
 
         <article class="cartao-resumo">
@@ -58,7 +58,7 @@ require_once '../includes/header.php';
     </section>
 
     <section class="grade-dashboard">
-        <article class="painel-dashboard painel-dashboard--amplo">
+        <article class="painel-dashboard">
             <div class="cabecalho-painel">
                 <div>
                     <p class="cabecalho-painel__rotulo">Categorias</p>
@@ -90,7 +90,7 @@ require_once '../includes/header.php';
 
                 <div class="item-progresso">
                     <div class="item-progresso__topo">
-                        <span>Lazer</span>
+                        <span>Compras</span>
                         <span>R$ 230,00 / R$ 200,00</span>
                     </div>
                     <div class="barra-progresso barra-progresso--perigo">
@@ -100,7 +100,7 @@ require_once '../includes/header.php';
 
                 <div class="item-progresso">
                     <div class="item-progresso__topo">
-                        <span>Saude</span>
+                        <span>Saúde</span>
                         <span>R$ 95,00 / R$ 180,00</span>
                     </div>
                     <div class="barra-progresso barra-progresso--dourada">
@@ -139,33 +139,67 @@ require_once '../includes/header.php';
             </div>
         </article>
 
-        <article class="painel-dashboard">
+        <article class="painel-dashboard painel-dashboard--resumo-maior">
             <div class="cabecalho-painel">
                 <div>
                     <p class="cabecalho-painel__rotulo">Resumo</p>
-                    <h2>Seu ritmo financeiro</h2>
+                    <h2>Para onde seu dinheiro foi</h2>
                 </div>
             </div>
 
-            <div class="pilha-insights">
-                <div class="cartao-insight cartao-insight--sucesso">
-                    <span>Maior controle</span>
-                    <strong>72% das categorias estao dentro da meta.</strong>
+            <div class="grafico-resumo">
+                <div class="grafico-resumo__circulo" aria-hidden="true">
+                    <div class="grafico-resumo__miolo">
+                        <span>Total</span>
+                        <strong>R$ 925,00</strong>
+                    </div>
                 </div>
 
-                <div class="cartao-insight cartao-insight--alerta">
-                    <span>Ponto de atencao</span>
-                    <strong>Lazer passou da meta mensal planejada.</strong>
-                </div>
+                <div class="legenda-resumo">
+                    <div class="item-legenda item-legenda--mercado">
+                        <div class="item-legenda__linha">
+                            <span class="item-legenda__nome">Mercado</span>
+                            <strong>45%</strong>
+                        </div>
+                        <div class="barra-legenda">
+                            <span style="width: 45%"></span>
+                        </div>
+                    </div>
 
-                <div class="cartao-insight cartao-insight--neutro">
-                    <span>Proximo passo</span>
-                    <strong>Revise gastos pendentes antes do fechamento do mes.</strong>
+                    <div class="item-legenda item-legenda--transporte">
+                        <div class="item-legenda__linha">
+                            <span class="item-legenda__nome">Transporte</span>
+                            <strong>20%</strong>
+                        </div>
+                        <div class="barra-legenda">
+                            <span style="width: 20%"></span>
+                        </div>
+                    </div>
+
+                    <div class="item-legenda item-legenda--lazer">
+                        <div class="item-legenda__linha">
+                            <span class="item-legenda__nome">Compras</span>
+                            <strong>25%</strong>
+                        </div>
+                        <div class="barra-legenda">
+                            <span style="width: 25%"></span>
+                        </div>
+                    </div>
+
+                    <div class="item-legenda item-legenda--saude">
+                        <div class="item-legenda__linha">
+                            <span class="item-legenda__nome">Saúde</span>
+                            <strong>10%</strong>
+                        </div>
+                        <div class="barra-legenda">
+                            <span style="width: 10%"></span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </article>
 
-        <article class="painel-dashboard painel-dashboard--amplo">
+        <article class="painel-dashboard painel-dashboard--movimentacoes">
             <div class="cabecalho-painel">
                 <div>
                     <p class="cabecalho-painel__rotulo">Movimentações</p>
@@ -201,15 +235,15 @@ require_once '../includes/header.php';
 
                 <div class="linha-atividade">
                     <span>Assinatura streaming</span>
-                    <span>Lazer</span>
+                    <span>Assinatura de serviços</span>
                     <span>23/04</span>
                     <span class="selo-status selo-status--pendente">Pendente</span>
                     <strong>R$ 34,90</strong>
                 </div>
 
                 <div class="linha-atividade">
-                    <span>Farmacia</span>
-                    <span>Saude</span>
+                    <span>Farmácia</span>
+                    <span>Saúde</span>
                     <span>22/04</span>
                     <span class="selo-status selo-status--pago">Pago</span>
                     <strong>R$ 58,30</strong>
