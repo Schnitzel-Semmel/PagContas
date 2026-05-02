@@ -125,10 +125,19 @@
 
 .painel-dashboard {
     padding: 24px;
+    min-width: 0;
 }
 
 .painel-dashboard--amplo {
     grid-column: span 1;
+}
+
+.painel-dashboard--movimentacoes {
+    grid-column: 1 / -1;
+}
+
+.painel-dashboard--resumo-maior {
+    min-height: 420px;
 }
 
 .cabecalho-painel {
@@ -164,6 +173,127 @@
 .pilha-insights {
     display: grid;
     gap: 18px;
+}
+
+.grafico-resumo {
+    display: grid;
+    grid-template-columns: 220px minmax(0, 1fr);
+    gap: 24px;
+    align-items: center;
+    min-height: 100%;
+}
+
+.grafico-resumo__circulo {
+    width: 220px;
+    height: 220px;
+    margin: 0 auto;
+    border-radius: 50%;
+    background:
+        conic-gradient(
+            #239a55 0 45%,
+            #3b82f6 45% 65%,
+            #ef4444 65% 90%,
+            #f59e0b 90% 100%
+        );
+    display: grid;
+    place-items: center;
+    position: relative;
+}
+
+.grafico-resumo__circulo::after {
+    content: "";
+    position: absolute;
+    inset: 20px;
+    border-radius: 50%;
+    background: #ffffff;
+}
+
+.grafico-resumo__miolo {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+}
+
+.grafico-resumo__miolo span {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--muted-color);
+    font-size: 0.9rem;
+}
+
+.grafico-resumo__miolo strong {
+    font-size: 1.45rem;
+}
+
+.legenda-resumo {
+    display: grid;
+    gap: 16px;
+}
+
+.item-legenda {
+    display: grid;
+    gap: 8px;
+}
+
+.item-legenda__linha {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    font-size: 0.94rem;
+}
+
+.item-legenda__nome {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.item-legenda__nome::before {
+    content: "";
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #239a55;
+    flex-shrink: 0;
+}
+
+.item-legenda--transporte .item-legenda__nome::before {
+    background: #3b82f6;
+}
+
+.item-legenda--lazer .item-legenda__nome::before {
+    background: #ef4444;
+}
+
+.item-legenda--saude .item-legenda__nome::before {
+    background: #f59e0b;
+}
+
+.barra-legenda {
+    height: 10px;
+    border-radius: 999px;
+    background: #e8eef6;
+    overflow: hidden;
+}
+
+.barra-legenda span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: #239a55;
+}
+
+.item-legenda--transporte .barra-legenda span {
+    background: #3b82f6;
+}
+
+.item-legenda--lazer .barra-legenda span {
+    background: #ef4444;
+}
+
+.item-legenda--saude .barra-legenda span {
+    background: #f59e0b;
 }
 
 .item-progresso__topo {
@@ -266,12 +396,15 @@
 .tabela-atividades {
     display: grid;
     gap: 12px;
+    width: 100%;
 }
 
 .tabela-atividades__cabecalho,
 .linha-atividade {
-    grid-template-columns: 1.3fr 1fr 0.7fr 0.8fr 0.8fr;
+    grid-template-columns: minmax(180px, 1.5fr) minmax(160px, 1.1fr) minmax(90px, 0.7fr) minmax(110px, 0.8fr) minmax(90px, 0.8fr);
     align-items: center;
+    column-gap: 16px;
+    min-width: 0;
 }
 
 .tabela-atividades__cabecalho {
@@ -287,6 +420,17 @@
     border: 1px solid var(--border-color);
     border-radius: 18px;
     background: #fbfdff;
+}
+
+.tabela-atividades__cabecalho span,
+.linha-atividade span,
+.linha-atividade strong {
+    min-width: 0;
+}
+
+.linha-atividade span:first-child,
+.linha-atividade span:nth-child(2) {
+    overflow-wrap: anywhere;
 }
 
 .selo-status {
@@ -333,6 +477,14 @@
     .linha-atividade {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
+
+    .grafico-resumo {
+        grid-template-columns: 1fr;
+    }
+
+    .painel-dashboard--resumo-maior {
+        min-height: auto;
+    }
 }
 
 @media (max-width: 640px) {
@@ -370,5 +522,10 @@
 
     .selo-status {
         justify-self: start;
+    }
+
+    .grafico-resumo__circulo {
+        width: 180px;
+        height: 180px;
     }
 }
