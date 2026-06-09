@@ -1,0 +1,140 @@
+/* ── DESKTOP LAYOUT – versão teste (≥ 1200px) ──────────── */
+:root { --sidebar-w: 240px; }
+
+@media (min-width: 1200px) {
+
+  /* ── RESET DAS RESTRIÇÕES DE TABLET ── */
+  body,
+  .dark body { background: #EAEFED; }
+  .dark body { background: #0c150f; }
+
+  /* ── TOP BAR: largura total ── */
+  .top-bar {
+    max-width: none;
+    left: 0; right: 0;
+    padding-left: 0;
+    padding-right: 24px;
+  }
+
+  /* Brand ocupa exatamente a largura da sidebar — cria alinhamento visual */
+  .top-bar__title {
+    width: var(--sidebar-w);
+    flex-shrink: 0;
+    padding-left: 20px;
+    box-sizing: border-box;
+  }
+
+  /* ── SIDEBAR (transforma o bottom-nav) ── */
+  .bottom-nav {
+    max-width: none;
+    width: var(--sidebar-w);
+    height: auto;
+    top: var(--top-h);
+    bottom: 0;
+    left: 0;
+    right: auto;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    border-top: none;
+    border-right: 1px solid var(--border);
+    padding-bottom: 24px;
+    box-shadow: 1px 0 6px rgba(0,0,0,.05);
+    overflow-y: auto;
+    background: var(--surface);
+  }
+
+  .bottom-nav__item {
+    flex: none;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 13px 22px;
+    gap: 13px;
+    font-size: .92rem;
+    font-weight: 500;
+    border-radius: 0;
+  }
+
+  .bottom-nav__item svg  { width: 20px; height: 20px; }
+  .bottom-nav__item span { font-size: .92rem; font-weight: 500; }
+
+  /* Indicador ativo: barra vertical à direita */
+  .bottom-nav__item--ativo::before {
+    top: 50%;
+    left: auto; right: 0;
+    transform: translateY(-50%);
+    width: 4px; height: 28px;
+    border-radius: 4px 0 0 4px;
+  }
+
+  /* ── CONTEÚDO ── */
+  .pagina {
+    max-width: none;
+    margin-left: var(--sidebar-w);
+    padding: calc(var(--top-h) + 28px) 40px 48px;
+    min-height: 100vh;
+  }
+
+  /* ── FAB ── */
+  .fab { right: 32px; bottom: 32px; }
+
+  /* ── TOAST ── */
+  .toast {
+    left: calc(var(--sidebar-w) + 50%);
+    transform: translateX(-50%) translateY(-10px);
+  }
+  .toast--visible {
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* ── AVISOS PHP ── */
+  .aviso-gastos,
+  .aviso-contas,
+  .aviso-categorias,
+  .aviso-configuracoes {
+    left: calc(var(--sidebar-w) + 16px);
+    right: 16px;
+    max-width: 480px;
+    transform: none;
+  }
+  @keyframes toastIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── BOTTOM SHEETS centrados no conteúdo ── */
+  .sheet-bg {
+    left: var(--sidebar-w);
+    max-width: none;
+    transform: none;
+  }
+  .bottom-sheet {
+    max-width: 520px;
+    left: calc(var(--sidebar-w) + 50%);
+    right: auto;
+    transform: translateX(-50%) translateY(100%);
+  }
+  .bottom-sheet--open {
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* ── CHIPS NÃO PRECISAM DE SCROLL HORIZONTAL ── */
+  .chips { flex-wrap: wrap; overflow-x: visible; }
+
+  /* ── DASHBOARD: hero/resumo full-width, grid 2×2 ── */
+  .dash-hero   { border-radius: 16px; }
+  .dash-resumo { grid-template-columns: repeat(3, 1fr); }
+
+  /* Grid 2 colunas: esquerda = gráfico, direita = dados */
+  .dash-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 20px;
+    align-items: start;
+  }
+
+  /* Remove margin lateral dos cards dentro das colunas */
+  .dash-col-left .card,
+  .dash-col-right .card { margin-left: 0; margin-right: 0; }
+}

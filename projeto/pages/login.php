@@ -8,77 +8,75 @@ if (isset($_SESSION['id_usuario'])) {
     exit;
 }
 
-$erro = $_GET['erro'] ?? '';
+$erro     = $_GET['erro']     ?? '';
 $telefone = $_GET['telefone'] ?? '';
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PagContas | Login</title>
-    <link rel="stylesheet" href="../css/global.css">
-    <link rel="stylesheet" href="../css/login.css">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>PagContas — Entrar</title>
+  <link rel="stylesheet" href="../css/global.css">
+  <link rel="stylesheet" href="../css/login.css">
 </head>
-<body>
-    <main class="login-page">
-        <section class="login-card">
-            <div class="login-brand">
-                <span class="login-brand__icon">PC</span>
-                <div>
-                    <p class="login-brand__name">PagContas</p>
-                    <p class="login-brand__subtitle">Entre na sua conta para continuar</p>
-                </div>
-            </div>
+<body class="login-body">
 
-            <h1 class="login-title">Entrar</h1>
-            <p class="login-description">
-                Use seu telefone e sua senha para acessar o sistema.
-            </p>
-            <?php if ($erro == 'sistema'): ?>
-                <div class="login-alert login-alert--error">
-                    Não foi possível entrar agora. Tente novamente.
-                </div>
-            <?php endif; ?>
+<div class="login-wrap">
+  <div class="login-hero">
+    <div class="login-logo">PC</div>
+    <h1>PagContas</h1>
+    <p>Gerencie suas contas com praticidade</p>
+  </div>
 
-            <form action="../actions/login_action.php" method="post" class="login-form" id="loginForm">
-                <div class="form-group">
-                    <label for="telefone">Telefone</label>
-                    <input
-                        type="text"
-                        id="telefone"
-                        name="telefone"
-                        placeholder="(99) 99999-9999"
-                        maxlength="15"
-                        value="<?= htmlspecialchars($telefone, ENT_QUOTES, 'UTF-8'); ?>"
-                    >
-                    <p id="error-telefone" class="msg-erro">Por favor, preencha o telefone.</p>
-                </div>
+  <div class="login-card">
+    <?php if ($erro === 'sistema'): ?>
+      <div class="login-alert login-alert--erro">
+        Não foi possível entrar agora. Tente novamente.
+      </div>
+    <?php endif; ?>
 
-                <div class="form-group">
-                    <label for="senha">Senha</label>
-                    <div class="password-field">
-                        <input
-                            type="password"
-                            id="senha"
-                            name="senha"
-                            placeholder="Digite sua senha"
-                        >
-                        <button type="button" class="password-toggle" id="toggleSenha">
-                            Mostrar
-                        </button>
-                    </div>
-                    <p id="error-senha" class="msg-erro">A senha é obrigatória.</p>
-                <?php if ($erro == 'usuario'): ?> 
-                    <p id="error-login" class="msg-erro">E-mail ou senha incorretos.</p>
-                <?php endif; ?>
-                </div>
-                
-                <button type="submit" class="login-button">Entrar</button>
-            </form>
-        </section>
-    </main>
-    <script src="../js/login.js"></script>
+    <form action="../actions/login_action.php" method="post" id="loginForm" class="form-grid">
+      <div class="campo">
+        <label for="telefone">Telefone</label>
+        <input
+          type="text"
+          id="telefone"
+          name="telefone"
+          placeholder="(99) 99999-9999"
+          maxlength="15"
+          inputmode="tel"
+          value="<?= htmlspecialchars($telefone, ENT_QUOTES, 'UTF-8'); ?>"
+          autocomplete="tel"
+        >
+        <span id="errTelefone" class="campo-erro">Telefone inválido.</span>
+      </div>
+
+      <div class="campo">
+        <label for="senha">Senha</label>
+        <div class="campo-senha">
+          <input
+            type="password"
+            id="senha"
+            name="senha"
+            placeholder="Sua senha"
+            autocomplete="current-password"
+          >
+          <button type="button" id="toggleSenha" class="campo-senha__toggle">Mostrar</button>
+        </div>
+        <span id="errSenha" class="campo-erro">Senha obrigatória.</span>
+        <?php if ($erro === 'usuario'): ?>
+          <span id="errLogin" class="campo-erro campo-erro--vis">Telefone ou senha incorretos.</span>
+        <?php endif; ?>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-block" style="margin-top:4px;">
+        Entrar
+      </button>
+    </form>
+  </div>
+</div>
+
+<script src="../js/login.js"></script>
 </body>
 </html>

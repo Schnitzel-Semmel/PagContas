@@ -48,6 +48,50 @@ LOCK TABLES `categoria` WRITE;
 /*!40000 ALTER TABLE `categoria` ENABLE KEYS */;
 UNLOCK TABLES;
 
+INSERT INTO `categoria` (`id_usuario`, `nome_categoria`, `cor`, `meta_mensal`, `is_system`, `is_active`)
+SELECT NULL, 'Compras', '#dc4f66', NULL, 1, 1
+WHERE NOT EXISTS (SELECT 1 FROM `categoria` WHERE `id_usuario` IS NULL AND `nome_categoria` = 'Compras');
+
+INSERT INTO `categoria` (`id_usuario`, `nome_categoria`, `cor`, `meta_mensal`, `is_system`, `is_active`)
+SELECT NULL, 'Comida e bebida', '#ef8c3a', NULL, 1, 1
+WHERE NOT EXISTS (SELECT 1 FROM `categoria` WHERE `id_usuario` IS NULL AND `nome_categoria` = 'Comida e bebida');
+
+INSERT INTO `categoria` (`id_usuario`, `nome_categoria`, `cor`, `meta_mensal`, `is_system`, `is_active`)
+SELECT NULL, 'Transferências', '#8d6bd1', NULL, 1, 1
+WHERE NOT EXISTS (SELECT 1 FROM `categoria` WHERE `id_usuario` IS NULL AND `nome_categoria` = 'Transferências');
+
+INSERT INTO `categoria` (`id_usuario`, `nome_categoria`, `cor`, `meta_mensal`, `is_system`, `is_active`)
+SELECT NULL, 'Transporte', '#3fa7d6', NULL, 1, 1
+WHERE NOT EXISTS (SELECT 1 FROM `categoria` WHERE `id_usuario` IS NULL AND `nome_categoria` = 'Transporte');
+
+INSERT INTO `categoria` (`id_usuario`, `nome_categoria`, `cor`, `meta_mensal`, `is_system`, `is_active`)
+SELECT NULL, 'Educação', '#7abf45', NULL, 1, 1
+WHERE NOT EXISTS (SELECT 1 FROM `categoria` WHERE `id_usuario` IS NULL AND `nome_categoria` = 'Educação');
+
+INSERT INTO `categoria` (`id_usuario`, `nome_categoria`, `cor`, `meta_mensal`, `is_system`, `is_active`)
+SELECT NULL, 'Mercado', '#239a55', NULL, 1, 1
+WHERE NOT EXISTS (SELECT 1 FROM `categoria` WHERE `id_usuario` IS NULL AND `nome_categoria` = 'Mercado');
+
+INSERT INTO `categoria` (`id_usuario`, `nome_categoria`, `cor`, `meta_mensal`, `is_system`, `is_active`)
+SELECT NULL, 'Gastos diversos', '#869394', NULL, 1, 1
+WHERE NOT EXISTS (SELECT 1 FROM `categoria` WHERE `id_usuario` IS NULL AND `nome_categoria` = 'Gastos diversos');
+
+INSERT INTO `categoria` (`id_usuario`, `nome_categoria`, `cor`, `meta_mensal`, `is_system`, `is_active`)
+SELECT NULL, 'Saúde', '#f5a623', NULL, 1, 1
+WHERE NOT EXISTS (SELECT 1 FROM `categoria` WHERE `id_usuario` IS NULL AND `nome_categoria` = 'Saúde');
+
+INSERT INTO `categoria` (`id_usuario`, `nome_categoria`, `cor`, `meta_mensal`, `is_system`, `is_active`)
+SELECT NULL, 'Assinatura de serviços', '#3b82f6', NULL, 1, 1
+WHERE NOT EXISTS (SELECT 1 FROM `categoria` WHERE `id_usuario` IS NULL AND `nome_categoria` = 'Assinatura de serviços');
+
+INSERT INTO `categoria` (`id_usuario`, `nome_categoria`, `cor`, `meta_mensal`, `is_system`, `is_active`)
+SELECT NULL, 'Tarifas financeiras', '#c66a5b', NULL, 1, 1
+WHERE NOT EXISTS (SELECT 1 FROM `categoria` WHERE `id_usuario` IS NULL AND `nome_categoria` = 'Tarifas financeiras');
+
+INSERT INTO `categoria` (`id_usuario`, `nome_categoria`, `cor`, `meta_mensal`, `is_system`, `is_active`)
+SELECT NULL, 'Impostos', '#ef4444', NULL, 1, 1
+WHERE NOT EXISTS (SELECT 1 FROM `categoria` WHERE `id_usuario` IS NULL AND `nome_categoria` = 'Impostos');
+
 --
 -- Table structure for table `config_relatorios_usuario`
 --

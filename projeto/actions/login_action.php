@@ -11,6 +11,11 @@ $telefone = trim($_POST['telefone'] ?? '');
 $senha = $_POST['senha'] ?? '';
 $telefoneNumeros = preg_replace('/\D+/', '', $telefone);
 
+if ($telefoneNumeros === '' || trim($senha) === '') {
+    header('Location: ../pages/login.php?erro=campos&telefone=' . urlencode($telefone));
+    exit;
+}
+
 try {
     $sql = 'SELECT id_usuario, nome, telefone, senha_hash FROM usuario WHERE telefone = :telefone AND status = :status LIMIT 1';
     $stmt = $conn->prepare($sql);

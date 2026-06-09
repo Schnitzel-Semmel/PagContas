@@ -1,0 +1,84 @@
+.pagina-contas { padding-bottom: calc(var(--nav-h) + 20px); }
+
+/* ── RESUMO ──────────────────────────────────────────── */
+.contas-resumo {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding: 16px 16px 6px;
+}
+.contas-chip {
+  border-radius: 14px;
+  padding: 16px 14px;
+  box-shadow: var(--shadow);
+}
+.contas-chip--vencida  { background: #FEECEC; }
+.contas-chip--pendente { background: #FEF3C7; }
+
+.contas-chip__label {
+  display: block;
+  font-size: .72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  margin-bottom: 4px;
+}
+.contas-chip--vencida  .contas-chip__label { color: var(--red); }
+.contas-chip--pendente .contas-chip__label { color: #7c4f00; }
+
+.contas-chip strong {
+  display: block;
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+.contas-chip__count {
+  font-size: .78rem;
+  color: var(--text-2);
+}
+
+/* ── CARD DE CONTA ──────────────────────────────────── */
+.conta-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 14px 14px 20px;
+}
+.conta-card__info { flex: 1; min-width: 0; }
+.conta-card__info strong {
+  display: block;
+  font-size: .95rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.conta-card__info span { font-size: .8rem; color: var(--text-2); }
+
+.conta-card__right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.conta-card__right strong { font-size: .95rem; font-weight: 700; }
+.conta-card__acoes {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.conta-card__acoes form { margin: 0; }
+
+/* ── DARK MODE ───────────────────────────────────────── */
+.dark .contas-chip--vencida  {
+  background: #2A1212;
+  border: 1px solid rgba(220,38,38,.35);
+}
+.dark .contas-chip--pendente {
+  background: #271E09;
+  border: 1px solid rgba(245,158,11,.30);
+}
+.dark .contas-chip--vencida  .contas-chip__label { color: #f87171; }
+.dark .contas-chip--pendente .contas-chip__label { color: #fbbf24; }
+.dark .contas-chip strong    { color: var(--text); }
+.dark .contas-chip__count    { color: var(--text-2); }

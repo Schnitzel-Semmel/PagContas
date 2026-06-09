@@ -1,0 +1,113 @@
+.pagina-config { padding-bottom: calc(var(--nav-h) + 20px); }
+
+/* ── PERFIL ──────────────────────────────────────────────── */
+.config-perfil {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 16px 12px;
+}
+.config-perfil strong { display: block; font-size: 1rem; margin-bottom: 2px; }
+.config-perfil span   { font-size: .85rem; color: var(--text-2); }
+
+/* Avatar com foto de perfil */
+.perfil-avatar-wrap {
+  position: relative; flex-shrink: 0; cursor: pointer;
+}
+.perfil-avatar-wrap input[type="file"] {
+  position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+}
+.perfil-avatar-overlay {
+  position: absolute; inset: 0; border-radius: 50%;
+  background: rgba(0,0,0,.35);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; transition: opacity .2s;
+  pointer-events: none;
+}
+.perfil-avatar-wrap:hover .perfil-avatar-overlay { opacity: 1; }
+.perfil-avatar-overlay svg { width: 18px; height: 18px; fill: #fff; }
+
+/* ── TÍTULOS DE SEÇÃO ──────────────────────────────────── */
+.config-sec-title {
+  display: flex; align-items: center; gap: 10px;
+  padding: 14px 16px 6px;
+  font-size: .75rem; font-weight: 700;
+  color: var(--text-2);
+  text-transform: uppercase; letter-spacing: .07em;
+}
+
+.config-status {
+  padding: 3px 10px; border-radius: 999px;
+  font-size: .72rem; font-weight: 700;
+  text-transform: none; letter-spacing: 0;
+}
+.config-status--on  { background: var(--color-accent-soft); color: var(--green-x); }
+.config-status--off { background: var(--border); color: var(--text-2); }
+
+/* ── CAMPOS ─────────────────────────────────────────────── */
+.config-field  { padding: 12px 16px; }
+.config-row    { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+/* ── CATEGORIAS (Melhoria 3.4) ──────────────────────────── */
+.cat-config-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.cat-config-item:last-child { border-bottom: none; }
+
+.cat-config-emoji {
+  font-size: 1.3rem; width: 36px; text-align: center; flex-shrink: 0;
+}
+.cat-config-nome {
+  flex: 1; min-width: 0;
+  font-size: .95rem; font-weight: 500;
+  cursor: pointer; padding: 4px 0;
+  border-bottom: 1.5px solid transparent;
+  transition: border-color .15s;
+  outline: none;
+  color: var(--text);
+  background: transparent;
+}
+.cat-config-nome:focus {
+  border-bottom-color: var(--green-x);
+}
+.cat-config-del {
+  background: none; border: none;
+  color: var(--text-2); padding: 6px;
+  border-radius: 8px; transition: color .15s, background .15s;
+}
+.cat-config-del:hover { color: var(--red); background: #FEECEC; }
+.cat-config-del svg { width: 18px; height: 18px; fill: currentColor; display: block; }
+
+/* Formulário de nova categoria */
+.cat-add-form {
+  padding: 14px 16px;
+  display: flex; flex-direction: column; gap: 12px;
+  border-top: 2px dashed var(--border);
+}
+.cat-add-form .form-row { grid-template-columns: 1fr auto auto; gap: 8px; }
+
+/* Emoji picker */
+.emoji-picker {
+  display: flex; flex-wrap: wrap; gap: 6px;
+  padding: 10px 0;
+}
+.emoji-opt {
+  font-size: 1.4rem; width: 42px; height: 42px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 10px; border: 2px solid transparent;
+  cursor: pointer; transition: border-color .15s, background .15s;
+  background: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.emoji-opt:hover      { background: var(--color-surface-2); }
+.emoji-opt--sel       { border-color: var(--green-x); background: var(--color-accent-soft); }
+
+/* ── PREVIEW DE FORMATO ─────────────────────────────────── */
+.format-preview {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 16px 4px;
+  font-size: .82rem; color: var(--text-2);
+}
+.format-preview strong { color: var(--green-x); font-size: .9rem; }
