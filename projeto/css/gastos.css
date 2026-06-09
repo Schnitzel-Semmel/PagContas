@@ -1,0 +1,54 @@
+.pagina-gastos { padding-bottom: calc(var(--nav-h) + 80px); }
+
+/* ── DIVISOR DE DATA ─────────────────────────────────── */
+.divisor-data {
+  padding: 10px 16px 6px;
+  font-size: .78rem;
+  font-weight: 700;
+  color: var(--text-2);
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+
+/* ── ITEM DE GASTO ───────────────────────────────────── */
+.gasto-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 14px 13px 20px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background .15s;
+}
+.gasto-item:active,
+.gasto-item--ativo { background: #F7F9FA; }
+
+.gasto-item__avatar { flex-shrink: 0; }
+.gasto-item__info   { flex: 1; min-width: 0; }
+.gasto-item__info strong {
+  display: block;
+  font-size: .95rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.gasto-item__info span { font-size: .8rem; color: var(--text-2); }
+
+.gasto-item__right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.gasto-item__right strong { font-size: .9rem; font-weight: 700; }
+
+/* ── AÇÕES (expansível) ──────────────────────────────── */
+.gasto-acoes {
+  display: none;
+  gap: 10px;
+  padding: 10px 14px 14px 20px;
+  background: #F7F9FA;
+}
+.gasto-acoes--open { display: flex; }
+.gasto-acoes form  { margin: 0; }

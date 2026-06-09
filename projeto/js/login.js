@@ -1,113 +1,57 @@
-const telefoneInput = document.getElementById("telefone");
-const senhaInput = document.getElementById("senha");
-const toggleSenha = document.getElementById("toggleSenha");
-const loginForm = document.getElementById("loginForm");
-const msgTelefone = document.getElementById("error-telefone");
-const msgSenha = document.getElementById("error-senha");
-const msgLogin = document.getElementById("error-login");
-const params = new URLSearchParams(window.location.search);
-const erro = params.get("erro");
+const fTelefone = document.getElementById('telefone');
+const fSenha    = document.getElementById('senha');
+const btnToggle = document.getElementById('toggleSenha');
+const form      = document.getElementById('loginForm');
+const errTel    = document.getElementById('errTelefone');
+const errSen    = document.getElementById('errSenha');
 
-function mostrarMensagem(elemento) {
-  if (elemento) {
-    elemento.style.display = "block";
-  }
+function mascTel(v) {
+  const n = v.replace(/\D/g, '').slice(0, 11);
+  if (n.length <= 2)  return n;
+  if (n.length <= 7)  return `(${n.slice(0,2)}) ${n.slice(2)}`;
+  return `(${n.slice(0,2)}) ${n.slice(2,7)}-${n.slice(7)}`;
 }
 
-function esconderMensagem(elemento) {
-  if (elemento) {
-    elemento.style.display = "none";
-  }
-}
-
-function limparErroTelefone() {
-  if (telefoneInput) {
-    telefoneInput.classList.remove("input-error");
-  }
-
-  esconderMensagem(msgTelefone);
-  esconderMensagem(msgLogin);
-}
-
-function limparErroSenha() {
-  if (senhaInput) {
-    senhaInput.classList.remove("input-error");
-  }
-  if (telefoneInput) {
-    telefoneInput.classList.remove("input-error");
-  }
-
-  esconderMensagem(msgTelefone);
-  esconderMensagem(msgLogin);
-  esconderMensagem(msgSenha);
-  esconderMensagem(msgLogin);
-}
-
-function aplicarMascaraTelefone(valor) {
-  const numeros = valor.replace(/\D/g, "").slice(0, 11);
-
-  if (numeros.length <= 2) return numeros;
-  if (numeros.length <= 7) return `(${numeros.slice(0, 2)}) ${numeros.slice(2)}`;
-  return `(${numeros.slice(0, 2)}) ${numeros.slice(2, 7)}-${numeros.slice(7, 11)}`;
-}
-
-if (telefoneInput) {
-  telefoneInput.addEventListener("input", (event) => {
-    event.target.value = aplicarMascaraTelefone(event.target.value);
-    limparErroTelefone();
-  });
-
-  telefoneInput.value = aplicarMascaraTelefone(telefoneInput.value);
-}
-
-if (senhaInput) {
-  senhaInput.addEventListener("input", () => {
-    limparErroSenha();
+if (fTelefone) {
+  fTelefone.value = mascTel(fTelefone.value);
+  fTelefone.addEventListener('input', e => {
+    e.target.value = mascTel(e.target.value);
+    fTelefone.classList.remove('input-erro');
+    if (errTel) errTel.style.display = 'none';
   });
 }
 
-if (toggleSenha && senhaInput) {
-  toggleSenha.addEventListener("click", () => {
-    const mostrando = senhaInput.type === "text";
-    senhaInput.type = mostrando ? "password" : "text";
-    toggleSenha.textContent = mostrando ? "Mostrar" : "Ocultar";
+if (fSenha) {
+  fSenha.addEventListener('input', () => {
+    fSenha.classList.remove('input-erro');
+    if (errSen) errSen.style.display = 'none';
   });
 }
 
-if (erro === "usuario") {
-  telefoneInput?.classList.add("input-error");
-  senhaInput?.classList.add("input-error");
-  mostrarMensagem(msgLogin);
+if (btnToggle && fSenha) {
+  btnToggle.addEventListener('click', () => {
+    const show = fSenha.type === 'text';
+    fSenha.type = show ? 'password' : 'text';
+    btnToggle.textContent = show ? 'Mostrar' : 'Ocultar';
+  });
 }
 
-if (loginForm) {
-  loginForm.addEventListener("submit", (event) => {
-    const telefone = telefoneInput.value.replace(/\D/g, "");
-    const senha = senhaInput.value.trim();
+if (form) {
+  form.addEventListener('submit', e => {
+    const tel = fTelefone.value.replace(/\D/g, '');
+    const sen = fSenha.value.trim();
+    let ok = true;
 
-    limparErroTelefone();
-    limparErroSenha();
-
-    if (!telefone || !senha) {
-      event.preventDefault();
-
-      if (!telefone) {
-        telefoneInput.classList.add("input-error");
-        mostrarMensagem(msgTelefone);
-      }
-
-      if (!senha) {
-        senhaInput.classList.add("input-error");
-        mostrarMensagem(msgSenha);
-      }
-
-      return;
+    if (!tel || tel.length < 10) {
+      fTelefone.classList.add('input-erro');
+      if (errTel) errTel.style.display = 'block';
+      ok = false;
     }
-
-    if (telefone.length < 10 || telefone.length > 11) {
-      event.preventDefault();
-      telefoneInput.classList.add("input-error");
-      mostrarMensagem(msgTelefone);
+    if (!sen) {
+      fSenha.classList.add('input-erro');
+      if (errSen) errSen.style.display = 'block';
+      ok = false;
     }
+    if (!ok) e.preventDefault();
   });
 }

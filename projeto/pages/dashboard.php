@@ -6,251 +6,298 @@ if (!isset($_SESSION['id_usuario'])) {
     exit;
 }
 
-$tituloPagina = 'Dashboard | PagContas';
-$cssPagina = 'dashboard.css';
-$nomeUsuario = $_SESSION['nome_usuario'] ?? 'Usuario';
+require_once '../config/connect.php';
+
+$tituloPagina  = 'Dashboard | PagContas';
+$tituloHeader  = 'PagContas';
+$cssPagina     = 'dashboard.css';
+$nomeUsuario   = $_SESSION['nome_usuario'] ?? 'Usuário';
+$idUsuario     = (int) $_SESSION['id_usuario'];
+$inicioMes     = date('Y-m-01');
+$fimMes        = date('Y-m-t');
+$hoje          = date('Y-m-d');
+
+function dinheiro(float $v): string {
+    return 'R$ ' . number_format($v, 2, ',', '.');
+}
+function dataCurta(?string $d): string {
+    return $d ? date('d/m', strtotime($d)) : '-';
+}
+
+/* Totais */
+$stmt = $conn->prepare("SELECT COALESCE(SUM(valor_gastos),0) FROM gasto WHERE id_usuario=:u AND deletado_quando IS NULL AND data_gasto BETWEEN :i AND :f");
+$stmt->execute([':u'=>$idUsuario,':i'=>$inicioMes,':f'=>$fimMes]);
+$totalMes = (float)$stmt->fetchColumn();
+
+$stmt = $conn->prepare("SELECT COUNT(*) FROM gasto WHERE id_usuario=:u AND deletado_quando IS NULL AND status='pendente'");
+$stmt->execute([':u'=>$idUsuario]);
+$contasPendentes = (int)$stmt->fetchColumn();
+
+$stmt = $conn->prepare("SELECT COUNT(*) FROM categoria WHERE is_active=1 AND (id_usuario IS NULL OR id_usuario=:u)");
+$stmt->execute([':u'=>$idUsuario]);
+$categoriasAtivas = (int)$stmt->fetchColumn();
+
+$stmt = $conn->prepare("SELECT tipo_agendamento FROM config_relatorios_usuario WHERE id_usuario=:u LIMIT 1");
+$stmt->execute([':u'=>$idUsuario]);
+$tipoRelatorio = $stmt->fetchColumn() ?: 'desativado';
+$rotulosRelatorio = ['intervalo'=>'Intervalo','personalizado'=>'Personalizado','desativado'=>'Desativado'];
+
+/* Próximos vencimentos */
+$stmt = $conn->prepare("SELECT descricao_gasto,vencimento_gasto,valor_gastos FROM gasto WHERE id_usuario=:u AND deletado_quando IS NULL AND status='pendente' AND vencimento_gasto>=:hoje ORDER BY vencimento_gasto ASC LIMIT 3");
+$stmt->execute([':u'=>$idUsuario,':hoje'=>$hoje]);
+$proximosVencimentos = $stmt->fetchAll();
+
+/* Últimos gastos — inclui todos os campos para o detail sheet */
+$stmt = $conn->prepare("
+    SELECT g.id_gasto, g.id_categoria, g.descricao_gasto, g.observacoes,
+           g.valor_gastos, g.data_gasto, g.vencimento_gasto, g.status,
+           COALESCE(c.nome_categoria,'Sem categoria') AS nome_categoria,
+           COALESCE(c.cor,'#40916C') AS cor_categoria
+    FROM gasto g
+    LEFT JOIN categoria c ON c.id_categoria=g.id_categoria
+    WHERE g.id_usuario=:u AND g.deletado_quando IS NULL
+    ORDER BY g.data_gasto DESC, g.id_gasto DESC
+    LIMIT 6
+");
+$stmt->execute([':u'=>$idUsuario]);
+$ultimosGastos = $stmt->fetchAll();
+
+/* Resumo por categoria */
+$stmt = $conn->prepare("
+    SELECT COALESCE(c.nome_categoria,'Sem categoria') AS nome_categoria,
+           COALESCE(c.cor,'#40916C') AS cor,
+           COALESCE(SUM(g.valor_gastos),0) AS total_gasto
+    FROM gasto g
+    LEFT JOIN categoria c ON c.id_categoria=g.id_categoria
+    WHERE g.id_usuario=:u AND g.deletado_quando IS NULL AND g.data_gasto BETWEEN :i AND :f
+    GROUP BY c.id_categoria, c.nome_categoria, c.cor
+    ORDER BY total_gasto DESC LIMIT 5
+");
+$stmt->execute([':u'=>$idUsuario,':i'=>$inicioMes,':f'=>$fimMes]);
+$resumoCategorias = $stmt->fetchAll();
+$totalResumo = array_sum(array_map(fn($r)=>(float)$r['total_gasto'], $resumoCategorias));
+
+/* Metas */
+$stmt = $conn->prepare("
+    SELECT c.nome_categoria, c.cor, c.meta_mensal,
+           COALESCE(SUM(g.valor_gastos),0) AS total_gasto
+    FROM categoria c
+    LEFT JOIN gasto g ON g.id_categoria=c.id_categoria AND g.id_usuario=:ug AND g.deletado_quando IS NULL AND g.data_gasto BETWEEN :i AND :f
+    WHERE c.is_active=1 AND (c.id_usuario IS NULL OR c.id_usuario=:uc) AND c.meta_mensal IS NOT NULL
+    GROUP BY c.id_categoria
+    ORDER BY total_gasto DESC LIMIT 4
+");
+$stmt->execute([':ug'=>$idUsuario,':uc'=>$idUsuario,':i'=>$inicioMes,':f'=>$fimMes]);
+$metasCategorias = $stmt->fetchAll();
+
+/* Categorias para o detail sheet */
+$stmt = $conn->prepare("SELECT id_categoria, nome_categoria, cor FROM categoria WHERE is_active=1 AND (id_usuario IS NULL OR id_usuario=:u) ORDER BY nome_categoria ASC");
+$stmt->execute([':u'=>$idUsuario]);
+$catSheet = $stmt->fetchAll();
 
 require_once '../includes/header.php';
 ?>
 
-<main class="pagina-dashboard">
-    <section class="painel-destaque">
-        <div class="painel-destaque__conteudo">
-            <span class="selo-dashboard">Visao geral financeira</span>
-            <h1>Bem-vindo de volta, <?= htmlspecialchars($nomeUsuario, ENT_QUOTES, 'UTF-8'); ?>.</h1>
-            <p>
-                Aqui voce acompanha seus gastos, confere contas proximas do vencimento
-                e enxerga onde o seu dinheiro esta sendo usado neste mes.
-            </p>
+<main class="pagina pagina-dashboard">
+
+  <!-- Hero card -->
+  <div class="dash-hero">
+    <p class="dash-hero__label">Gastos de <?= date('M/Y') ?></p>
+    <h2 class="dash-hero__valor"><?= dinheiro($totalMes) ?></h2>
+    <p class="dash-hero__sub">Olá, <?= htmlspecialchars($nomeUsuario, ENT_QUOTES, 'UTF-8') ?> 👋</p>
+  </div>
+
+  <!-- Chips resumo -->
+  <div class="dash-resumo">
+    <div class="dash-chip">
+      <strong><?= $contasPendentes ?></strong>
+      <span>Pendentes</span>
+    </div>
+    <div class="dash-chip">
+      <strong><?= $categoriasAtivas ?></strong>
+      <span>Categorias</span>
+    </div>
+    <div class="dash-chip">
+      <strong><?= htmlspecialchars($rotulosRelatorio[$tipoRelatorio] ?? '-', ENT_QUOTES, 'UTF-8') ?></strong>
+      <span>Relatório</span>
+    </div>
+  </div>
+
+  <div class="dash-grid">
+
+    <!-- Coluna esquerda: gráfico por categoria -->
+    <div class="dash-col-left">
+      <?php if ($resumoCategorias): ?>
+      <div class="sec-header">
+        <h3>Por categoria</h3>
+        <span style="font-size:.85rem;color:var(--text-2);"><?= date('M/Y') ?></span>
+      </div>
+      <div class="card" style="margin:0 16px 6px;">
+        <div style="display:flex;flex-direction:row;align-items:center;gap:16px;padding:12px 16px;">
+          <canvas id="chartCategorias" width="130" height="130" style="flex-shrink:0;"></canvas>
+          <div style="flex:1;min-width:0;">
+            <?php foreach ($resumoCategorias as $cat):
+              $pct = $totalResumo > 0 ? round(((float)$cat['total_gasto'] / $totalResumo) * 100) : 0;
+            ?>
+            <div class="cat-barra">
+              <div class="cat-barra__top">
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span class="cat-dot" style="background:<?= htmlspecialchars($cat['cor'], ENT_QUOTES, 'UTF-8') ?>;"></span>
+                  <span><?= htmlspecialchars($cat['nome_categoria'], ENT_QUOTES, 'UTF-8') ?></span>
+                </div>
+                <span style="font-size:.85rem;color:var(--text-2);"><?= $pct ?>%</span>
+              </div>
+              <div class="progress">
+                <div class="progress__fill" style="width:<?= $pct ?>%;background:<?= htmlspecialchars($cat['cor'], ENT_QUOTES, 'UTF-8') ?>;"></div>
+              </div>
+            </div>
+            <?php endforeach; ?>
+          </div>
         </div>
+      </div>
+      <?php endif; ?>
 
-        <div class="painel-destaque__resumo">
-            <p class="painel-destaque__rotulo">Saldo previsto do mês</p>
-            <strong>R$ 2.480,00</strong>
-            <span>Atualizado com base nas suas movimentações recentes.</span>
+      <?php if ($metasCategorias): ?>
+      <div class="sec-header" style="margin-top:8px;">
+        <h3>Metas do mês</h3>
+        <a href="categorias.php">Gerenciar</a>
+      </div>
+      <div class="card" style="margin:0 16px 6px;padding:4px 16px 12px;">
+        <?php foreach ($metasCategorias as $m):
+          $meta  = (float)$m['meta_mensal'];
+          $gasto = (float)$m['total_gasto'];
+          $pct   = $meta > 0 ? min(100, round(($gasto/$meta)*100)) : 0;
+          $cls   = $pct >= 100 ? 'danger' : ($pct >= 75 ? 'warning' : '');
+        ?>
+        <div class="cat-barra">
+          <div class="cat-barra__top">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span class="cat-dot" style="background:<?= htmlspecialchars($m['cor'], ENT_QUOTES, 'UTF-8') ?>;"></span>
+              <span><?= htmlspecialchars($m['nome_categoria'], ENT_QUOTES, 'UTF-8') ?></span>
+            </div>
+            <span style="font-size:.82rem;color:var(--text-2);"><?= dinheiro($gasto) ?> / <?= dinheiro($meta) ?></span>
+          </div>
+          <div class="progress">
+            <div class="progress__fill<?= $cls ? ' progress__fill--'.$cls : '' ?>" style="width:<?= $pct ?>%;background:<?= htmlspecialchars($m['cor'], ENT_QUOTES, 'UTF-8') ?>;"></div>
+          </div>
         </div>
-    </section>
+        <?php endforeach; ?>
+      </div>
+      <?php endif; ?>
+    </div><!-- /.dash-col-left -->
 
-    <section class="grade-resumo">
-        <article class="cartao-resumo cartao-resumo--destaque">
-            <span class="cartao-resumo__rotulo">Gastos do mês</span>
-            <strong class="cartao-resumo__valor">R$ 0000,00</strong>
-            <p class="cartao-resumo__meta">Add porcentagem em relacao ao mes passado</p>
-        </article>
+    <!-- Coluna direita: listas de dados -->
+    <div class="dash-col-right">
+      <?php if ($proximosVencimentos): ?>
+      <div class="sec-header">
+        <h3>Próximos vencimentos</h3>
+        <a href="contas.php">Ver tudo</a>
+      </div>
+      <div class="card" style="margin:0 16px 6px;">
+        <?php foreach ($proximosVencimentos as $i => $v): ?>
+        <div class="venc-item <?= $i < count($proximosVencimentos)-1 ? 'venc-item--sep' : '' ?>">
+          <div class="venc-item__info">
+            <strong><?= htmlspecialchars($v['descricao_gasto'], ENT_QUOTES, 'UTF-8') ?></strong>
+            <span>Vence em <?= dataCurta($v['vencimento_gasto']) ?></span>
+          </div>
+          <strong class="venc-item__valor"><?= dinheiro((float)$v['valor_gastos']) ?></strong>
+        </div>
+        <?php endforeach; ?>
+      </div>
+      <?php endif; ?>
 
-        <article class="cartao-resumo">
-            <span class="cartao-resumo__rotulo">Contas pendentes</span>
-            <strong class="cartao-resumo__valor">0</strong>
-            <p class="cartao-resumo__meta">Colocar a conta mais proxima que vai vencer</p>
-        </article>
-
-        <article class="cartao-resumo">
-            <span class="cartao-resumo__rotulo">Categorias ativas</span>
-            <strong class="cartao-resumo__valor">11</strong>
-            <p class="cartao-resumo__meta">Categorias padrão disponíveis para todas as contas</p>
-        </article>
-
-        <article class="cartao-resumo">
-            <span class="cartao-resumo__rotulo">Relatório configurado</span>
-            <strong class="cartao-resumo__valor">Quinzenal</strong>
-            <p class="cartao-resumo__meta">Proximo envio em 30/04</p>
-        </article>
-    </section>
-
-    <section class="grade-dashboard">
-        <article class="painel-dashboard">
-            <div class="cabecalho-painel">
-                <div>
-                    <p class="cabecalho-painel__rotulo">Categorias</p>
-                    <h2>Meta mensal por categoria</h2>
-                </div>
-                <a href="categorias.php" class="link-painel">Gerenciar</a>
+      <div class="sec-header" style="margin-top:8px;">
+        <h3>Últimos lançamentos</h3>
+        <a href="gastos.php">Ver tudo</a>
+      </div>
+      <div class="card" style="margin:0 16px 6px;">
+        <?php if ($ultimosGastos): ?>
+          <?php foreach ($ultimosGastos as $i => $g): ?>
+          <div class="gasto-row <?= $i < count($ultimosGastos)-1 ? 'gasto-row--sep' : '' ?> gasto-clickable"
+               data-id="<?= (int)$g['id_gasto'] ?>"
+               data-desc="<?= htmlspecialchars($g['descricao_gasto'], ENT_QUOTES, 'UTF-8') ?>"
+               data-valor="<?= htmlspecialchars((string)$g['valor_gastos'], ENT_QUOTES, 'UTF-8') ?>"
+               data-data="<?= htmlspecialchars($g['data_gasto'], ENT_QUOTES, 'UTF-8') ?>"
+               data-venc="<?= htmlspecialchars($g['vencimento_gasto'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
+               data-status="<?= $g['status'] ?>"
+               data-id-categoria="<?= (int)($g['id_categoria'] ?? 0) ?>"
+               data-nome-categoria="<?= htmlspecialchars($g['nome_categoria'], ENT_QUOTES, 'UTF-8') ?>"
+               data-obs="<?= htmlspecialchars($g['observacoes'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
+            <div class="avatar avatar-sm" style="background:<?= htmlspecialchars($g['cor_categoria'], ENT_QUOTES, 'UTF-8') ?>;">
+              <?= mb_strtoupper(mb_substr($g['nome_categoria'], 0, 1, 'UTF-8'), 'UTF-8') ?>
             </div>
-
-            <div class="lista-progresso">
-                <div class="item-progresso">
-                    <div class="item-progresso__topo">
-                        <span>Mercado</span>
-                        <span>R$ 420,00 / R$ 600,00</span>
-                    </div>
-                    <div class="barra-progresso">
-                        <span style="width: 70%"></span>
-                    </div>
-                </div>
-
-                <div class="item-progresso">
-                    <div class="item-progresso__topo">
-                        <span>Transporte</span>
-                        <span>R$ 180,00 / R$ 250,00</span>
-                    </div>
-                    <div class="barra-progresso barra-progresso--azul">
-                        <span style="width: 72%"></span>
-                    </div>
-                </div>
-
-                <div class="item-progresso">
-                    <div class="item-progresso__topo">
-                        <span>Compras</span>
-                        <span>R$ 230,00 / R$ 200,00</span>
-                    </div>
-                    <div class="barra-progresso barra-progresso--perigo">
-                        <span style="width: 100%"></span>
-                    </div>
-                </div>
-
-                <div class="item-progresso">
-                    <div class="item-progresso__topo">
-                        <span>Saúde</span>
-                        <span>R$ 95,00 / R$ 180,00</span>
-                    </div>
-                    <div class="barra-progresso barra-progresso--dourada">
-                        <span style="width: 53%"></span>
-                    </div>
-                </div>
+            <div class="gasto-row__info">
+              <strong><?= htmlspecialchars($g['descricao_gasto'], ENT_QUOTES, 'UTF-8') ?></strong>
+              <span><?= htmlspecialchars($g['nome_categoria'], ENT_QUOTES, 'UTF-8') ?> · <?= dataCurta($g['data_gasto']) ?></span>
             </div>
-        </article>
-
-        <article class="painel-dashboard">
-            <div class="cabecalho-painel">
-                <div>
-                    <p class="cabecalho-painel__rotulo">Contas</p>
-                    <h2>Próximos vencimentos</h2>
-                </div>
-                <a href="contas.php" class="link-painel">Ver tudo</a>
+            <div class="gasto-row__right">
+              <strong style="color:var(--red);">-<?= dinheiro((float)$g['valor_gastos']) ?></strong>
+              <span class="badge <?= $g['status']==='pago' ? 'badge-pago' : 'badge-pendente' ?>"><?= $g['status']==='pago' ? 'Pago' : 'Pendente' ?></span>
             </div>
+          </div>
+          <?php endforeach; ?>
+        <?php else: ?>
+          <div class="empty">
+            <svg viewBox="0 0 24 24"><path d="M19.5 3.5 18 2l-1.5 1.5L15 2l-1.5 1.5L12 2l-1.5 1.5L9 2 7.5 3.5 6 2 4.5 3.5 3 2v20l1.5-1.5L6 22l1.5-1.5L9 22l1.5-1.5L12 22l1.5-1.5L15 22l1.5-1.5L18 22l1.5-1.5L21 22V2l-1.5 1.5z"/></svg>
+            <p>Nenhum gasto registrado ainda.</p>
+          </div>
+        <?php endif; ?>
+      </div>
+    </div><!-- /.dash-col-right -->
 
-            <div class="lista-contas">
+  </div><!-- /.dash-grid -->
 
-                <div class="item-conta">
-                    <div>
-                        <strong>Energia eletrica</strong>
-                        <span>Vence em 30/04</span>
-                    </div>
-                    <em>R$ 214,70</em>
-                </div>
-
-                <div class="item-conta">
-                    <div>
-                        <strong>Plano de celular</strong>
-                        <span>Vence em 02/05</span>
-                    </div>
-                    <em>R$ 59,90</em>
-                </div>
-            </div>
-        </article>
-
-        <article class="painel-dashboard painel-dashboard--resumo-maior">
-            <div class="cabecalho-painel">
-                <div>
-                    <p class="cabecalho-painel__rotulo">Resumo</p>
-                    <h2>Para onde seu dinheiro foi</h2>
-                </div>
-            </div>
-
-            <div class="grafico-resumo">
-                <div class="grafico-resumo__circulo" aria-hidden="true">
-                    <div class="grafico-resumo__miolo">
-                        <span>Total</span>
-                        <strong>R$ 925,00</strong>
-                    </div>
-                </div>
-
-                <div class="legenda-resumo">
-                    <div class="item-legenda item-legenda--mercado">
-                        <div class="item-legenda__linha">
-                            <span class="item-legenda__nome">Mercado</span>
-                            <strong>45%</strong>
-                        </div>
-                        <div class="barra-legenda">
-                            <span style="width: 45%"></span>
-                        </div>
-                    </div>
-
-                    <div class="item-legenda item-legenda--transporte">
-                        <div class="item-legenda__linha">
-                            <span class="item-legenda__nome">Transporte</span>
-                            <strong>20%</strong>
-                        </div>
-                        <div class="barra-legenda">
-                            <span style="width: 20%"></span>
-                        </div>
-                    </div>
-
-                    <div class="item-legenda item-legenda--lazer">
-                        <div class="item-legenda__linha">
-                            <span class="item-legenda__nome">Compras</span>
-                            <strong>25%</strong>
-                        </div>
-                        <div class="barra-legenda">
-                            <span style="width: 25%"></span>
-                        </div>
-                    </div>
-
-                    <div class="item-legenda item-legenda--saude">
-                        <div class="item-legenda__linha">
-                            <span class="item-legenda__nome">Saúde</span>
-                            <strong>10%</strong>
-                        </div>
-                        <div class="barra-legenda">
-                            <span style="width: 10%"></span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </article>
-
-        <article class="painel-dashboard painel-dashboard--movimentacoes">
-            <div class="cabecalho-painel">
-                <div>
-                    <p class="cabecalho-painel__rotulo">Movimentações</p>
-                    <h2>Ultimos gastos registrados</h2>
-                </div>
-                <a href="gastos.php" class="link-painel">Abrir gastos</a>
-            </div>
-
-            <div class="tabela-atividades">
-                <div class="tabela-atividades__cabecalho">
-                    <span>Descricao</span>
-                    <span>Categoria</span>
-                    <span>Data</span>
-                    <span>Status</span>
-                    <span>Valor</span>
-                </div>
-
-                <div class="linha-atividade">
-                    <span>Compra no mercado</span>
-                    <span>Mercado</span>
-                    <span>24/04</span>
-                    <span class="selo-status selo-status--pago">Pago</span>
-                    <strong>R$ 186,40</strong>
-                </div>
-
-                <div class="linha-atividade">
-                    <span>Uber para faculdade</span>
-                    <span>Transporte</span>
-                    <span>23/04</span>
-                    <span class="selo-status selo-status--pago">Pago</span>
-                    <strong>R$ 24,90</strong>
-                </div>
-
-                <div class="linha-atividade">
-                    <span>Assinatura streaming</span>
-                    <span>Assinatura de serviços</span>
-                    <span>23/04</span>
-                    <span class="selo-status selo-status--pendente">Pendente</span>
-                    <strong>R$ 34,90</strong>
-                </div>
-
-                <div class="linha-atividade">
-                    <span>Farmácia</span>
-                    <span>Saúde</span>
-                    <span>22/04</span>
-                    <span class="selo-status selo-status--pago">Pago</span>
-                    <strong>R$ 58,30</strong>
-                </div>
-            </div>
-        </article>
-    </section>
 </main>
+
+<a href="gastos.php#novo" class="fab" aria-label="Adicionar gasto">
+  <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+</a>
+
+<!-- Detail Sheet -->
+<?php require_once '../includes/gasto_detail_sheet.php'; ?>
+<script>window.CATEGORIAS = <?= json_encode($catSheet, JSON_HEX_QUOT | JSON_HEX_TAG) ?>;</script>
+<script src="../js/gasto-detail.js"></script>
+
+<?php if ($resumoCategorias): ?>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script>
+(function () {
+  var labels = <?= json_encode(array_column($resumoCategorias, 'nome_categoria'), JSON_HEX_TAG) ?>;
+  var dados  = <?= json_encode(array_map('floatval', array_column($resumoCategorias, 'total_gasto'))) ?>;
+  var cores  = <?= json_encode(array_column($resumoCategorias, 'cor'), JSON_HEX_TAG) ?>;
+  var isDark = document.documentElement.classList.contains('dark');
+  var borda  = isDark ? '#1A2E22' : '#FFFFFF';
+
+  new Chart(document.getElementById('chartCategorias'), {
+    type: 'doughnut',
+    data: {
+      labels: labels,
+      datasets: [{
+        data: dados,
+        backgroundColor: cores,
+        borderColor: borda,
+        borderWidth: 3,
+        hoverOffset: 8
+      }]
+    },
+    options: {
+      responsive: false,
+      cutout: '62%',
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: function (ctx) {
+              var v = ctx.parsed;
+              return ' R$ ' + v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            }
+          }
+        }
+      }
+    }
+  });
+})();
+</script>
+<?php endif; ?>
 
 <?php require_once '../includes/footer.php'; ?>
